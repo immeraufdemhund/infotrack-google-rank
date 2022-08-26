@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Net;
+using System.Text.Json;
+using FluentAssertions;
 using InfoTrack.Google.Tests.Drivers;
 using InfoTrack.GoogleRank;
 using Microsoft.Extensions.Options;
@@ -9,11 +11,13 @@ namespace InfoTrack.Google.Tests.Steps;
 [Binding]
 public sealed class WebApplicationSteps
 {
+    private readonly WebApplicationStepsState _state;
     private readonly WebApplicationDriver _webApplicationDriver;
 
-    public WebApplicationSteps(WebApplicationDriver webApplicationDriver)
+    public WebApplicationSteps(WebApplicationDriver webApplicationDriver, WebApplicationStepsState state)
     {
         _webApplicationDriver = webApplicationDriver;
+        _state = state;
     }
 
     [Given("the backend api has initialized")]
@@ -55,6 +59,14 @@ public sealed class WebApplicationSteps
         _webApplicationDriver.SetConfigValue(key, value);
     }
 
+    [When(@"a api user calls GET on (.*)")]
+    public async Task MakeCallToApi(string relativeUri)
+    {
+        using var client = _webApplicationDriver.Client;
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, relativeUri);
+        _state.CurrentResponseFromApi = await client.SendAsync(httpRequest);
+    }
+
     [Then(@"the default value for (.*) should be (.*)")]
     [Then(@"when I get (.*) from IConfiguration it should be (.*)")]
     public void CheckDefaultValueForKey(string key, string value)
@@ -67,5 +79,19 @@ public sealed class WebApplicationSteps
     {
         var currentSettings = _webApplicationDriver.Get<IOptionsMonitor<GoogleSettings>>().CurrentValue;
         table.CompareToInstance(currentSettings);
+    }
+
+    [Then("a json result with a data property has 100 values in it")]
+    public async Task CheckContent()
+    {
+        var response = _state.CurrentResponseFromApi;
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType.MediaType.Should().Be("application/json");
+        var content = await response.Content.ReadAsStreamAsync();
+        var jsonDocument = await JsonDocument.ParseAsync(content);
+        jsonDocument.RootElement.TryGetProperty("data", out var dataElement)
+            .Should()
+            .BeTrue("because I expect the json object returned to have a data array");
+        dataElement.GetArrayLength().Should().Be(100, "I'm expecting 100 values returned from google");
     }
 }

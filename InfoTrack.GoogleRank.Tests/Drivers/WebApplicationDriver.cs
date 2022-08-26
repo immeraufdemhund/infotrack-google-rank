@@ -5,6 +5,7 @@ namespace InfoTrack.Google.Tests.Drivers;
 
 public sealed class WebApplicationDriver : IDisposable
 {
+    internal HttpClient Client => _application.CreateDefaultClient();
     internal T Get<T>() => _application.Services.GetRequiredService<T>();
 
     private WebApplicationFactory<Program> _application;
