@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoTrack.GoogleRank", "InfoTrack.GoogleRank\InfoTrack.GoogleRank.csproj", "{8C07F566-D096-4A24-BA62-405739F8A8FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoTrack.GoogleRank.Tests", "InfoTrack.GoogleRank.Tests\InfoTrack.GoogleRank.Tests.csproj", "{254DB050-4A28-4DA5-B887-C3C0B893D26E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{8C07F566-D096-4A24-BA62-405739F8A8FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C07F566-D096-4A24-BA62-405739F8A8FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C07F566-D096-4A24-BA62-405739F8A8FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{254DB050-4A28-4DA5-B887-C3C0B893D26E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{254DB050-4A28-4DA5-B887-C3C0B893D26E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{254DB050-4A28-4DA5-B887-C3C0B893D26E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{254DB050-4A28-4DA5-B887-C3C0B893D26E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
