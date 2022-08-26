@@ -14,3 +14,6 @@ Scenario: I need to be able to change query result limit in code for testing
     Then the default value for QueryResultLimit should be 100
     When I change the value of QueryResultLimit to 50
     Then when I get QueryResultLimit from IConfiguration it should be 50
+    And the current snapshot of GoogleSettings should be
+    | property name    | value |
+    | QueryResultLimit | 50    |
