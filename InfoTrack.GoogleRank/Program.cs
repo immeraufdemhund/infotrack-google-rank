@@ -1,9 +1,15 @@
+using InfoTrack.GoogleRank.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddHttpClient<GoogleRankService>(client =>
+{
+    client.BaseAddress = new Uri("https://google.com");
+});
+builder.Services.AddSingleton<IHtmlScraper, HardCodedHtmlScraper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,6 +29,7 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 
 app.MapFallbackToFile("index.html");
-;
 
 app.Run();
+
+public partial class Program { }
