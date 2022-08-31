@@ -24,6 +24,10 @@ public class GoogleRankController : ControllerBase
         _logger.LogInformation("getting rank from google for efiling+integration");
         var rawHtml = await _service.SearchGoogleFor("efiling+integration");
         var data = await _scraper.SelectElementsWithCssSelector(rawHtml, _logger);
-        return new OkObjectResult(new {data});
+        const string searchString = "www.infotrack.com";
+        var indexOfInfotrack = data.FirstOrDefault(x => x.Url.Contains(searchString));
+        var summary = (default(IndexedUrl).Equals(indexOfInfotrack)) ?
+            $"Didn't find {searchString} in the search results" : $"Found {searchString} at the {indexOfInfotrack.Index + 1}";
+        return new OkObjectResult(new {data, summary});
     }
 }

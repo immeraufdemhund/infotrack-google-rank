@@ -1,16 +1,74 @@
-﻿namespace InfoTrack.GoogleRank.Services;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 
-public class DirtyHtmlScraper
+namespace InfoTrack.GoogleRank.Services;
+
+public class DirtyHtmlScraper : IHtmlScraper
 {
-    private readonly string _html;
-    public static DirtyHtmlScraper Parse(string html) => new DirtyHtmlScraper(html);
-    private DirtyHtmlScraper(string html)
+    private delegate IndexedUrl[] CssSelector(TextReader reader, ILogger logger);
+    public Task<IndexedUrl[]> SelectElementsWithCssSelector(Stream stream, ILogger logger)
     {
-        _html = html;
+        using var reader = new StreamReader(stream);
+
+        SkipUntilDivId_search(reader);
+        var depth = 0;
+        while (true)
+        {
+            var c = GuardAgainstEndOfStream(reader);
+            if (c == '<')
+            {
+                var element = ReadToEndOfElement(reader, "<");
+                if (element.StartsWith("<div"))
+                {
+                    depth++;
+                }
+
+                if (element.StartsWith("</div>"))
+                {
+                    depth--;
+                }
+            }
+        }
     }
 
-    public object[] GetAllElements(string cssSelector)
+    private static string GetId(string element) => Regex.Match(element, @" id=[""'](?'id'.+?)[""']").Groups["id"].Value;
+    private static void SkipUntilDivId_search(TextReader s)
     {
-        return new object[100];
+        while (true)
+        {
+            var c = GuardAgainstEndOfStream(s);
+            if (c == '<')
+            {
+                var element = ReadToEndOfElement(s, "<");
+                if (element.StartsWith("<div"))
+                {
+                    if (GetId(element).Equals("search"))
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private static string ReadToEndOfElement(TextReader s, string elementStart)
+    {
+        var sb = new StringBuilder(elementStart);
+        while (true)
+        {
+            var c = GuardAgainstEndOfStream(s);
+            sb.Append(c);
+            if (c == '>')
+            {
+                return sb.ToString();
+            }
+        }
+    }
+
+    private static char GuardAgainstEndOfStream(TextReader s)
+    {
+        var value = s.Read();
+        if (value < 1) throw new Exception("Unexpected End Of Stream condition");
+        return Convert.ToChar(value);
     }
 }

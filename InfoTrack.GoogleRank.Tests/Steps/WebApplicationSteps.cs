@@ -84,14 +84,54 @@ public sealed class WebApplicationSteps
     [Then("a json result with a data property has 100 values in it")]
     public async Task CheckContent()
     {
-        var response = _state.CurrentResponseFromApi;
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Content.Headers.ContentType.MediaType.Should().Be("application/json");
-        var content = await response.Content.ReadAsStreamAsync();
-        var jsonDocument = await JsonDocument.ParseAsync(content);
-        jsonDocument.RootElement.TryGetProperty("data", out var dataElement)
+        var jsonDocument = await ParseResponseContentAsJson();
+        jsonDocument.TryGetProperty("data", out var dataElement)
             .Should()
             .BeTrue("because I expect the json object returned to have a data array");
         dataElement.GetArrayLength().Should().Be(100, "I'm expecting 100 values returned from google");
+    }
+
+    [Then("a json result with a summary property is a string value")]
+    public async Task CheckSummaryProperty()
+    {
+        var jsonDocument = await ParseResponseContentAsJson();
+        jsonDocument.TryGetProperty("summary", out var summaryElement)
+            .Should()
+            .BeTrue("because I expect the json object returned to have a summary property");
+        summaryElement.ValueKind.Should().Be(JsonValueKind.String);
+    }
+
+    [Then(@"the summary property contains '(.*)'")]
+    public async Task ThenTheSummaryPropertyContains(string expectedSummaryContents)
+    {
+        var jsonDocument = await ParseResponseContentAsJson();
+        var summary = jsonDocument.GetProperty("summary").GetString();
+        summary.Should().Contain(expectedSummaryContents);
+    }
+
+    [Then(@"the summary property has numbers in it")]
+    public async Task ThenTheSummaryPropertyHasNumbersInIt()
+    {
+        var jsonDocument = await ParseResponseContentAsJson();
+        var summary = jsonDocument.GetProperty("summary").GetString();
+        summary.Should().MatchRegex(@"\d+");
+    }
+
+    private async Task<JsonElement> ParseResponseContentAsJson()
+    {
+        if (_state.CurrentContentFromCurrentResponse == null)
+        {
+            var response = _state.CurrentResponseFromApi;
+            AssertContentIsJson(response);
+            var content = await response.Content.ReadAsStreamAsync();
+            _state.CurrentContentFromCurrentResponse = await JsonDocument.ParseAsync(content);
+        }
+        return _state.CurrentContentFromCurrentResponse.RootElement.Clone();
+    }
+
+    private static void AssertContentIsJson(HttpResponseMessage response)
+    {
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType.MediaType.Should().Be("application/json");
     }
 }
