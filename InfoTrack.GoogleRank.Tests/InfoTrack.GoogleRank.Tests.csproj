@@ -25,4 +25,10 @@
     <ProjectReference Include="..\InfoTrack.GoogleRank\InfoTrack.GoogleRank.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Services\Top100EfilingIntegrationSearchPage.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

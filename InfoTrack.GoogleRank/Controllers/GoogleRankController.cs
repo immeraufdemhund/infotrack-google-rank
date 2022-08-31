@@ -9,11 +9,13 @@ public class GoogleRankController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly GoogleRankService _service;
+    private readonly IHtmlScraper _scraper;
 
-    public GoogleRankController(ILogger<GoogleRankController> logger, GoogleRankService service)
+    public GoogleRankController(ILogger<GoogleRankController> logger, GoogleRankService service, IHtmlScraper scraper)
     {
         _logger = logger;
         _service = service;
+        _scraper = scraper;
     }
 
     [HttpGet]
@@ -21,8 +23,7 @@ public class GoogleRankController : ControllerBase
     {
         _logger.LogInformation("getting rank from google for efiling+integration");
         var rawHtml = await _service.SearchGoogleFor("efiling+integration");
-        var scraper = DirtyHtmlScraper.Parse(rawHtml);
-        var data = scraper.GetAllElements(".element");
+        var data = await _scraper.SelectElementsWithCssSelector(rawHtml, _logger);
         return new OkObjectResult(new {data});
     }
 }

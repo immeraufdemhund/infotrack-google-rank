@@ -1,4 +1,3 @@
-using InfoTrack.GoogleRank.Controllers;
 using InfoTrack.GoogleRank.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +9,7 @@ builder.Services.AddHttpClient<GoogleRankService>(client =>
 {
     client.BaseAddress = new Uri("https://google.com");
 });
+builder.Services.AddSingleton<IHtmlScraper, HardCodedHtmlScraper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
