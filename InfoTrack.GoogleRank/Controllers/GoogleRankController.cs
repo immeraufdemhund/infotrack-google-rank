@@ -26,7 +26,7 @@ public class GoogleRankController : ControllerBase
         var data = await _scraper.SelectElementsWithCssSelector(rawHtml, _logger);
         const string searchString = "www.infotrack.com";
         var indexOfInfotrack = data.FirstOrDefault(x => x.Url.Contains(searchString));
-        var summary = (default(IndexedUrl).Equals(indexOfInfotrack)) ?
+        var summary = indexOfInfotrack == null ?
             $"Didn't find {searchString} in the search results" : $"Found {searchString} at the {indexOfInfotrack.Index + 1}";
         return new OkObjectResult(new {data, summary});
     }

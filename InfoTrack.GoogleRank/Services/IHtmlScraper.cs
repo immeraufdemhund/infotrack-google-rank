@@ -5,10 +5,10 @@ public interface IHtmlScraper
     Task<IndexedUrl[]> SelectElementsWithCssSelector(Stream stream, ILogger logger);
 }
 
-public readonly struct IndexedUrl
+public class IndexedUrl
 {
-    public readonly int Index;
-    public readonly string Url;
+    public int Index { get; }
+    public string Url { get; }
     public IndexedUrl(int index, string url)
     {
         Index = index;
