@@ -19,11 +19,6 @@ public sealed class WebApplicationDriver : IDisposable
     private void ConfigureTestServicesToReplaceRealServices(IWebHostBuilder builder)
     {
         builder
-            .ConfigureServices(collection =>
-            {
-                collection.AddOptions<GoogleSettings>()
-                    .Configure<IConfiguration>((settings, configuration) => configuration.Bind(settings));
-            })
             .ConfigureLogging(loggingBuilder =>
             {
                 loggingBuilder.AddSimpleConsole();
