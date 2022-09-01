@@ -81,14 +81,14 @@ public sealed class WebApplicationSteps
         table.CompareToInstance(currentSettings);
     }
 
-    [Then("a json result with a data property has 100 values in it")]
-    public async Task CheckContent()
+    [Then(@"a json result with a data property has (\d+) values in it")]
+    public async Task CheckContent(int expectedCount)
     {
         var jsonDocument = await ParseResponseContentAsJson();
         jsonDocument.TryGetProperty("data", out var dataElement)
             .Should()
             .BeTrue("because I expect the json object returned to have a data array");
-        dataElement.GetArrayLength().Should().Be(100, "I'm expecting 100 values returned from google");
+        dataElement.GetArrayLength().Should().Be(expectedCount, "I'm expecting a certain number of values returned from google");
     }
 
     [Then("a json result with a summary property is a string value")]
@@ -115,6 +115,32 @@ public sealed class WebApplicationSteps
         var jsonDocument = await ParseResponseContentAsJson();
         var summary = jsonDocument.GetProperty("summary").GetString();
         summary.Should().MatchRegex(@"\d+");
+    }
+
+    [Then(@"the first result in data should have a non empty string value in the url property")]
+    public async Task ThenFirstResultHasUrlProperty()
+    {
+        var jsonDocument = await ParseResponseContentAsJson();
+        jsonDocument.TryGetProperty("data", out var dataElement)
+            .Should()
+            .BeTrue("because I expect the json object returned to have a summary property");
+
+        dataElement[0].TryGetProperty("url", out var urlElement).Should().BeTrue("The data element should have a url property");
+        urlElement.ValueKind.Should().Be(JsonValueKind.String);
+        urlElement.GetString().Should().NotBeNullOrEmpty();
+    }
+
+    [Then(@"a numeric value '(\d+)' in index property")]
+    public async Task ThenFirstResultHasIndexProperty(int expectedIndex)
+    {
+        var jsonDocument = await ParseResponseContentAsJson();
+        jsonDocument.TryGetProperty("data", out var dataElement)
+            .Should()
+            .BeTrue("because I expect the json object returned to have a summary property");
+
+        dataElement[0].TryGetProperty("index", out var indexElement).Should().BeTrue("The data element should have a index property");
+        indexElement.ValueKind.Should().Be(JsonValueKind.Number);
+        indexElement.GetInt32().Should().Be(expectedIndex);
     }
 
     private async Task<JsonElement> ParseResponseContentAsJson()
