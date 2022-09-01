@@ -27,7 +27,8 @@ public class GoogleRankController : ControllerBase
         const string searchString = "www.infotrack.com";
         var indexOfInfotrack = data.FirstOrDefault(x => x.Url.Contains(searchString));
         var summary = indexOfInfotrack == null ?
-            $"Didn't find {searchString} in the search results" : $"Found {searchString} at the {indexOfInfotrack.Index + 1}";
+            $"Didn't find {searchString} in the search results" :
+            $"Found {searchString} with a rank of {indexOfInfotrack.Index + 1}";
         return new OkObjectResult(new {data, summary});
     }
 }
