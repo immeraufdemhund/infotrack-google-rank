@@ -12,7 +12,8 @@ builder.Services.AddHttpClient<GoogleRankService>(client =>
 });
 builder.Services.AddOptions<GoogleSettings>()
     .Configure<IConfiguration>((settings, configuration) => configuration.Bind(settings));
-builder.Services.AddSingleton<IHtmlScraper, HardCodedHtmlScraper>();
+
+builder.Services.AddSingleton<IHtmlScraper, DirtyHtmlScraper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
