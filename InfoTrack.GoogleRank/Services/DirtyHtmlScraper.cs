@@ -4,6 +4,7 @@ namespace InfoTrack.GoogleRank.Services;
 
 public class DirtyHtmlScraper : IHtmlScraper
 {
+    public bool WriteResultToFile { get; set; }
     public async Task<IndexedUrl[]> SelectElementsWithCssSelector(Stream stream, ILogger logger)
     {
         using var reader = new StreamReader(stream);
@@ -16,6 +17,8 @@ public class DirtyHtmlScraper : IHtmlScraper
         else
         {
             logger.LogWarning("Did not find any search result divs to return results with");
+            if(WriteResultToFile)
+                File.WriteAllText(@$"c:\temp\result{DateTime.UtcNow:HHmmss}.html", text);
             return Array.Empty<IndexedUrl>();
         }
 
@@ -38,6 +41,8 @@ public class DirtyHtmlScraper : IHtmlScraper
         catch (InvalidOperationException e)
         {
             logger.LogError(e, "my css search string for where the results are must be wrong");
+            if(WriteResultToFile)
+                File.WriteAllText(@$"c:\temp\result{DateTime.UtcNow:HHmmss}.html", text);
             return Array.Empty<IndexedUrl>();
         }
     }
