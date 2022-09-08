@@ -21,8 +21,9 @@ public class DirtyHtmlScraper : IHtmlScraper
 
         try
         {
+            var classNameOfDivWithResult = GetSearchStringFromCssSelector(".BNeawe.UPmit.AP7Wnd");
             return matches
-                .Select(resultElement => resultElement.Single(x => x.Value.Contains(GetSearchStringFromCssSelector(".BNeawe.UPmit.AP7Wnd"))))
+                .Select(resultElement => resultElement.Single(x => x.Value.Contains(classNameOfDivWithResult)))
                 .Select(urlHeaderElement =>
                 {
                     var endOfOpeningDivTagIndex = text.IndexOf(">", urlHeaderElement.Index);
@@ -117,6 +118,6 @@ public class DirtyHtmlScraper : IHtmlScraper
 
         var classMatches = Regex.Matches(cssSelector, @".(?'className'\w+)");
         var classNames = string.Join(" ", classMatches.Select(m => m.Groups["className"].Value));
-        return $"class=\"{classNames}\"";
+        return $"class=\"{classNames}";
     }
 }

@@ -19,7 +19,7 @@ public class DirtyHtmlScraperTests
     [Test]
     public async Task ReturnsStringArrayWithSpecificClass()
     {
-        await using var stream = ReadTop100EfilingIntegrationSearchPage();
+        await using var stream = OpenRead("efiling+integration.html");
 
         var result = await _scraper.SelectElementsWithCssSelector(stream, NullLogger.Instance);
 
@@ -28,11 +28,22 @@ public class DirtyHtmlScraperTests
         result[98].Should().BeEquivalentTo(new { Index = 98, Url = "www.lawpracticetoday.org" });
     }
 
-    private Stream ReadTop100EfilingIntegrationSearchPage()
+    [Test]
+    public async Task FoundVariation()
     {
-        const string FileName = "efiling+integration.html";
-        var path = Directory.EnumerateFiles(TestContext.CurrentContext.TestDirectory, FileName, SearchOption.AllDirectories).FirstOrDefault();
-        path.Should().NotBeNullOrEmpty("couldn't find file {0} in directory or sub-directories from {1}", FileName, TestContext.CurrentContext.TestDirectory);
+        await using var stream = OpenRead("result174124.html");
+
+        var result = await _scraper.SelectElementsWithCssSelector(stream, NullLogger.Instance);
+
+        result.Should().HaveCount(99);
+        result[0].Should().BeEquivalentTo(new { Index = 0, Url = "www.infotrack.com" });
+        result[98].Should().BeEquivalentTo(new { Index = 98, Url = "support.taulia.com" });
+    }
+
+    private static Stream OpenRead(string fileName)
+    {
+        var path = Directory.EnumerateFiles(TestContext.CurrentContext.TestDirectory, fileName, SearchOption.AllDirectories).FirstOrDefault();
+        path.Should().NotBeNullOrEmpty("couldn't find file {0} in directory or sub-directories from {1}", fileName, TestContext.CurrentContext.TestDirectory);
         return File.OpenRead(path);
     }
 }
